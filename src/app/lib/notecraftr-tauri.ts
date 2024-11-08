@@ -12,63 +12,70 @@ import { resolve } from "@tauri-apps/api/path";
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 
+export function getCurrentNCWindow() {
+  return getCurrentWindow();
+}
+
 export function onResized(handler: EventCallback<PhysicalSize>) {
-  return getCurrentWindow().onResized(handler);
+  return getCurrentNCWindow().onResized(handler);
 }
 
 export function onMoved(handler: EventCallback<PhysicalPosition>) {
-  return getCurrentWindow().onMoved(handler);
+  return getCurrentNCWindow().onMoved(handler);
 }
 
 export function onFocusChanged(handler: EventCallback<boolean>){
-  return getCurrentWindow().onFocusChanged(handler);
+  return getCurrentNCWindow().onFocusChanged(handler);
 }
 
 export function emitToWindows(target: string, event: string, payload?: unknown){
   return emitTo(target, event, payload)
 }
 
+
+
+
 export function isMaximized() {
-  return getCurrentWindow().isMaximized();
+  return getCurrentNCWindow().isMaximized();
 }
 
 export function maximizeWindow() {
-  return getCurrentWindow().maximize();
+  return getCurrentNCWindow().maximize();
 }
 
 export function unmaximizeWindow() {
-  return getCurrentWindow().unmaximize();
+  return getCurrentNCWindow().unmaximize();
 }
 
 export function minimizeWindow() {
-  return getCurrentWindow().minimize();
+  return getCurrentNCWindow().minimize();
 }
 
 export function closeWindow() {
-  return getCurrentWindow().close();
+  return getCurrentNCWindow().close();
 }
 
 export function startDragging() {
-  return getCurrentWindow().startDragging();
+  return getCurrentNCWindow().startDragging();
 }
 
 export function getWindowSize() {
-  return getCurrentWindow().innerSize();
+  return getCurrentNCWindow().innerSize();
 }
 
 export function getWindowPosition() {
-  return getCurrentWindow().innerPosition();
+  return getCurrentNCWindow().innerPosition();
 }
 
 export function getWindowFocused() {
-  return getCurrentWindow().isFocused();
+  return getCurrentNCWindow().isFocused();
 }
 
 
 export function onCloseWindowRequest(
   handler: (event: CloseRequestedEvent) => void | Promise<void>
 ) {
-  return getCurrentWindow().onCloseRequested(handler);
+  return getCurrentNCWindow().onCloseRequested(handler);
 }
 
 export function writeTextToClipboard(text: string) {

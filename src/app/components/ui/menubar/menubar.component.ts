@@ -15,6 +15,8 @@ import { Template } from "../../../types/notecraftr";
 import {
   closeWindow,
   emitToWindows,
+  getAllNoteCraftrWindows,
+  getCurrentNCWindow,
   maximizeWindow,
   minimizeWindow,
   startDragging,
@@ -202,8 +204,20 @@ export class MenubarComponent {
     maximizeWindow();
   }
 
-  closeApp() {
-    closeWindow();
+  async closeApp() {
+    if (getCurrentNCWindow().label === "notecraftr") {
+      getAllNoteCraftrWindows()
+      .then((windows) => {
+        windows.forEach(async (w) => {
+          if (w.label !== "notecraftr") {
+            await w.close();
+          }
+        });
+      })
+      .finally(() => closeWindow());
+    } else {
+      closeWindow();
+    }
   }
 
   minimizeApp() {
