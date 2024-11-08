@@ -47,7 +47,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": ["icons/32x32.png", "icons/gen.paniterce.png"]
+    "resources": []
 
   }
 }

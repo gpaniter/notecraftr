@@ -6,7 +6,7 @@ import { Avatar, AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { Store } from '@ngrx/store';
-import { fileSrcToUrl, openUrl } from '../../lib/notecraftr-tauri';
+import { openUrl } from '../../lib/notecraftr-tauri';
 import * as WindowState from '../../state/window';
 import { Subscription } from 'rxjs';
 
@@ -30,7 +30,7 @@ export class AboutComponent implements OnInit {
 
   ngOnInit() {
     getVersion().then(v => this.version.set(v));
-    this.developerImgLink.set(fileSrcToUrl("./icons/gen.paniterce.png"));
+    this.developerImgLink.set("https://avatars.githubusercontent.com/u/73551111?v=4");
     this.$devImgErr = this.devAvatar().onImageError.subscribe(() => {
       this.devAvatarLabel.set("GP");
     })
