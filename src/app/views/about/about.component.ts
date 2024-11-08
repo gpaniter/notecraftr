@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import {  Component, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Location, NgClass } from '@angular/common';
 import { getVersion } from '@tauri-apps/api/app';
@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
-export class AboutComponent implements OnInit, AfterViewInit {
+export class AboutComponent implements OnInit {
   store = inject(Store);
   theme = this.store.selectSignal(WindowState.theme);
   locationService = inject(Location);
@@ -30,29 +30,10 @@ export class AboutComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     getVersion().then(v => this.version.set(v));
-    // this.developerImg.set(fileSrcToUrl("./icons/sgen.paniterce.png"));
-    this.developerImgLink.set(fileSrcToUrl("./icons/sgen.paniterce.png"));
+    this.developerImgLink.set(fileSrcToUrl("./icons/gen.paniterce.png"));
     this.$devImgErr = this.devAvatar().onImageError.subscribe(() => {
       this.devAvatarLabel.set("GP");
     })
-  }
-
-  ngAfterViewInit(): void {
-    // this.checkDevImageLink();
-  }
-
-  checkDevImageLink() {
-    const img = new Image();
-    const thisClass = this;
-    const src = fileSrcToUrl("./icons/sgen.paniterce.png");
-    img.onload = function () {
-      thisClass.developerImgLink.set(src);
-    };
-    img.onerror = function () {
-        thisClass.developerImgLink.set(undefined)
-    };
-
-    img.src = src;
   }
 
   onBackClick() {
