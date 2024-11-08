@@ -164,7 +164,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   openYoutube = () => {
-    openUrl("https://www.youtube.com/@gen.paniterce/");
+    openUrl("https://youtu.be/9nK1fooJSPQ");
   };
 
   togglePreview() {

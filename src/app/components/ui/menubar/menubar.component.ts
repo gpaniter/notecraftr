@@ -11,12 +11,10 @@ import { MenuItem, Message } from "primeng/api";
 import { DialogService } from "primeng/dynamicdialog";
 import { TooltipModule } from "primeng/tooltip";
 import { NgClass } from "@angular/common";
-
 import { Template } from "../../../types/notecraftr";
 import {
   closeWindow,
   emitToWindows,
-  fileSrcToUrl,
   maximizeWindow,
   minimizeWindow,
   startDragging,
@@ -51,7 +49,6 @@ export class MenubarComponent {
   notePreviewWindowMode = this.store.selectSignal(WindowState.notePreviewWindowMode);
   templates = this.store.selectSignal(EditorState.templates);
   activeTemplate = this.store.selectSignal(EditorState.activeTemplate);
-  appIcon = signal("");
   mouseHovered = signal(false);
   closeButtonHovered = signal(false);
   editorMode = computed(() => {
@@ -156,9 +153,6 @@ export class MenubarComponent {
     }
   });
 
-  async ngOnInit() {
-    this.appIcon.set(fileSrcToUrl("icons/32x32.png"));
-  }
 
   ngOnDestroy(): void {}
 

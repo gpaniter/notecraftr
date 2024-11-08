@@ -23,6 +23,8 @@ body {
   user-select: none; /* Standard syntax */
 }
 
+
+
 .card-bg-1 {
   --s: 150px; /* control the size*/
   --c1: var(--complimentary-color-b);
@@ -244,6 +246,7 @@ body {
   width: 36px;
   height: 36px;
 }
+
 
 html {
   //   @extend .card-bg-12;

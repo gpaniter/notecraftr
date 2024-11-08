@@ -9,10 +9,10 @@
   <div class="left-container" id="tauri-drag">
     <!-- REMOVED FEATURE BECAUSE BUGGY -->
     @if (!windowBlured()) {
-        <div class="add-note-button" pRipple (click)="addNote()">
-          <span class="fluent--add-16-regular"></span>
-        </div>
-      }
+    <div class="add-note-button" pRipple (click)="addNote()">
+      <span class="fluent--add-16-regular"></span>
+    </div>
+    }
   </div>
 
   } @else {
@@ -27,7 +27,7 @@
       hideDelay="300"
       routerLink=""
     >
-      <img style="width: 18px; height: 18px" [src]="appIcon()" alt="" />
+      <span class="notecraftr-icon icon-20"></span>
     </p-button>
 
     @if (editorMode()) {

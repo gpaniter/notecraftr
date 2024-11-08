@@ -16,7 +16,7 @@
       [ngClass]="{ 'text-container-light': theme().theme == 'light' }"
     >
       <div class="app-title">
-        <img [src]="appIcon()" />
+        <span class="notecraftr-icon" style="width: 50px; height: 50px;"></span>
         <span class="heading">
           <span> NoteCraftr </span>
           <span class="version">{{ version() }}</span>
@@ -57,7 +57,8 @@
       </div>
       <p-divider/>
       <div class="developer-info">
-        <p-avatar [image]="developerImg()" size="xlarge" shape="circle" />
+        <p-avatar [style]="{backgroundColor: 'var(--surface-card)'}" [label]="devAvatarLabel()" [image]="developerImgLink()" size="xlarge" shape="circle">
+        </p-avatar>
         <span class="email">gen.paniterce&#64;gmail.com</span>
       </div>
   

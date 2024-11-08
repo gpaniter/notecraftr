@@ -22,7 +22,7 @@ export class EditorEffects extends EffectsWrapper {
     () =>
       this.actions$.pipe(
         tap((action) => {
-          if (true) {
+          if (false) {
             console.log(action);
           }
         })

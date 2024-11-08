@@ -1,6 +1,6 @@
 [package]
 name = "NoteCraftr"
-version = "0.2.4"
+version = "0.2.6"
 description = "NoteCraftr"
 authors = ["gen.paniterce"]
 license = "gen.paniterce 2024"

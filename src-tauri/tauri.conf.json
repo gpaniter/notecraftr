@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "NoteCraftr",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "identifier": "com.notecraftr.dev",
   "build": {
     "frontendDist": "../dist/notecraftr-desktop/browser",
@@ -28,13 +28,14 @@
     "security": {
       "assetProtocol": {
         "enable": true,
-        "scope": ["**"]
+        
+        "scope": ["**/*"]
       },
       "csp": null
     }
   },
   "bundle": {
-    "publisher": "gen.paniterce",
+    "publisher": "gen.paniterce", 
     "copyright": "gen.paniterce 2024",
     "category": "Productivity",
     "active": true,
@@ -46,7 +47,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": ["icons/32x32.png", "icons/Square44x44Logo.png", "icons/gen.paniterce.png"]
+    "resources": ["icons/32x32.png", "icons/gen.paniterce.png"]
 
   }
 }

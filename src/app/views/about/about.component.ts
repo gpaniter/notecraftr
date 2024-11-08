@@ -1,13 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Location, NgClass } from '@angular/common';
 import { getVersion } from '@tauri-apps/api/app';
-import { AvatarModule } from 'primeng/avatar';
+import { Avatar, AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { Store } from '@ngrx/store';
 import { fileSrcToUrl, openUrl } from '../../lib/notecraftr-tauri';
 import * as WindowState from '../../state/window';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'nc-about',
@@ -16,19 +17,42 @@ import * as WindowState from '../../state/window';
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent implements OnInit, AfterViewInit {
   store = inject(Store);
   theme = this.store.selectSignal(WindowState.theme);
   locationService = inject(Location);
   currentYear = new Date().getFullYear();
   version = signal("");
-  appIcon = signal("");
-  developerImg = signal("");
+  developerImgLink = signal<string | undefined>(undefined);
+  devAvatar = viewChild.required<Avatar>(Avatar);
+  devAvatarLabel = signal<string | undefined>(undefined);
+  $devImgErr: Subscription | undefined;
 
   ngOnInit() {
     getVersion().then(v => this.version.set(v));
-    this.appIcon.set(fileSrcToUrl("icons/Square44x44Logo.png"));
-    this.developerImg.set(fileSrcToUrl("icons/gen.paniterce.png"));
+    // this.developerImg.set(fileSrcToUrl("./icons/sgen.paniterce.png"));
+    this.developerImgLink.set(fileSrcToUrl("./icons/sgen.paniterce.png"));
+    this.$devImgErr = this.devAvatar().onImageError.subscribe(() => {
+      this.devAvatarLabel.set("GP");
+    })
+  }
+
+  ngAfterViewInit(): void {
+    // this.checkDevImageLink();
+  }
+
+  checkDevImageLink() {
+    const img = new Image();
+    const thisClass = this;
+    const src = fileSrcToUrl("./icons/sgen.paniterce.png");
+    img.onload = function () {
+      thisClass.developerImgLink.set(src);
+    };
+    img.onerror = function () {
+        thisClass.developerImgLink.set(undefined)
+    };
+
+    img.src = src;
   }
 
   onBackClick() {
@@ -36,16 +60,15 @@ export class AboutComponent implements OnInit {
   }
 
   openGitHub = () => {
-    openUrl("https://github.com/gpaniter/")
+    openUrl("https://github.com/mark7p/")
   }
 
   openYoutube = () => {
-    openUrl("https://www.youtube.com/@gen.paniterce/")
+    openUrl("https://www.youtube.com/@mark.paniterce/")
   }
 
   openMicrosoftStore = () => {
-    return;
-    openUrl("https://www.youtube.com/@gen.paniterce/")
+    openUrl("https://www.microsoft.com/store/productId/9NTTN07T2PC2?ocid=pdpshare")
   }
   
   openChromeWebStore = () => {
