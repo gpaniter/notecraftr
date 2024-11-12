@@ -1,6 +1,6 @@
 [package]
 name = "NoteCraftr"
-version = "0.2.6"
+version = "0.2.7"
 description = "NoteCraftr"
 authors = ["gen.paniterce"]
 license = "gen.paniterce 2024"
@@ -15,13 +15,13 @@ name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.2", features = [] }
+tauri-build = { version = "2.0.3", features = [] }
 
 [dependencies]
 serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0.215", features = ["derive"] }
 log = "0.4"
-tauri = { version = "2.0.6", features = ["protocol-asset", "image-png", "image-ico",] }
+tauri = { version = "2.1.1", features = ["protocol-asset", "image-png", "image-ico",] }
 tauri-plugin-log = "2.0.2"
 tauri-plugin-clipboard-manager = "2.0.2"
 tauri-plugin-shell = "2.0.2"
