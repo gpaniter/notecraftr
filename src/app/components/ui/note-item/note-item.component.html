@@ -1,10 +1,14 @@
 <div
   class="main-container"
-  [class]="note().backgroundClass || ''"
+  [class]="note().backgroundClass || 'card-bg-default'"
   (mouseenter)="setActionVisible(true)"
   (mouseleave)="setActionVisible(false)"
 >
-  <!-- <pre class="note-preview">{{ note().text }}</pre> -->
+<div class="note-color-bar"></div>
+  @if (!actionsVisible()) {
+    <span class="date-updated">{{note().updatedDate| date: dateFormat()}}</span>
+  }  
+
   <p-editor
     [formControl]="textFormControl"
     [style]="{ color: 'white' }"
@@ -15,6 +19,7 @@
       <span class="ql-formats"></span>
     </ng-template>
   </p-editor>
+  
 
   <div
     class="actions-container"

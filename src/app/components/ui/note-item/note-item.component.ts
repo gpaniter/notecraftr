@@ -1,7 +1,7 @@
-import { Component, input, isDevMode, OnDestroy, OnInit, output, signal } from "@angular/core";
+import { Component, computed, input, isDevMode, OnDestroy, OnInit, output, signal } from "@angular/core";
 import { ButtonModule } from "primeng/button";
 import { TooltipModule } from "primeng/tooltip";
-import { NgClass } from "@angular/common";
+import { DatePipe, NgClass } from "@angular/common";
 import { EditorModule } from "primeng/editor";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
@@ -11,7 +11,7 @@ import { Note } from "../../../types/notecraftr";
 @Component({
   selector: "nc-note-item",
   standalone: true,
-  imports: [ButtonModule, TooltipModule, NgClass, EditorModule, ReactiveFormsModule],
+  imports: [ButtonModule, TooltipModule, NgClass, EditorModule, ReactiveFormsModule, DatePipe],
   templateUrl: "./note-item.component.html",
   styleUrl: "./note-item.component.scss",
   providers: []
@@ -26,6 +26,12 @@ export class NoteItemComponent implements OnInit , OnDestroy{
   onDuplicate = output<Note>();
   onEdit = output<Note>();
   onShowHideNote = output<{note: Note, hide: boolean}>();
+  dateFormat  = computed(() => {
+    const updatedDate = this.note().updatedDate || new Date();
+    const currentDate = new Date();
+    const daysSinceUpdated = (currentDate.getTime() - updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceUpdated > 1 ? 'MMM d, y' : 'h:mm a'
+  });
 
 
   ngOnInit(): void {

@@ -1,4 +1,7 @@
 <div class="main-container" [class]="note.backgroundClass">
+    @if (windowBlured()) {
+        <span class="date-updated">{{updatedDate() | date: dateFormat()}}</span>
+      } 
     <p-editor #editor [formControl]="textFormControl" placeholder="Take a note..." [style]="{ height: '100%' }">
         <ng-template pTemplate="header">
 

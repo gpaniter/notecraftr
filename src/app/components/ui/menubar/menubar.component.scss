@@ -2,9 +2,9 @@
     display: grid;
     height: 2.7rem;
     background-color: var(--complimentary-color-a);
-    // background-color: var(--surface-card);
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     grid-template-columns: 1fr auto;
+    grid-auto-flow: column;
     transition: height 0.2s;
     
 }
@@ -45,9 +45,12 @@
     grid-auto-columns: auto;
     justify-content: start;
     justify-items: center;
+    width: 100%;
     align-items: center;
-    grid-template-columns: auto auto auto 1fr;
+}
 
+.left-container-editor{
+    grid-template-columns: auto auto 1fr !important;
 }
 
 .title-container {

@@ -55,5 +55,6 @@ export type Note = {
   y?: number;
   width?: number;
   height?: number;
+  updatedDate?: Date;
 }
 

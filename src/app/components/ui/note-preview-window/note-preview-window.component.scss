@@ -1,8 +1,17 @@
 .main-container{
     display: grid;
+    position: relative;
     // padding: 1rem;
     height: 100%;
 }
+
+.date-updated {
+    position: absolute;
+    right: 1rem;
+    top: 0.5rem;
+    font-size: x-small;
+    color: var(--text-color-secondary);
+  }
 
 .ql-formats {
     // background-color: red;

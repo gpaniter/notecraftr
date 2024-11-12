@@ -106,13 +106,13 @@ export function setToDatabase<T>(key: string, data: T) {
 export function getFromDatabase<T>(key: string): T | undefined {
   const newData = localStorage.getItem(key);
   if (typeof newData === "string") {
-    const parsed = JSON.parse(newData, sectionDateRevicer);
+    const parsed = JSON.parse(newData, dateReviver);
     return parsed ? (parsed as T) : undefined;
   } else return undefined;
 }
 
-export function sectionDateRevicer(key: string, value: any) {
-  if (key == "dateValue") {
+export function dateReviver(key: string, value: any) {
+  if (key === "dateValue" || key=== "updatedDate") {
     try {
       return new Date(value);
     } catch (error) {

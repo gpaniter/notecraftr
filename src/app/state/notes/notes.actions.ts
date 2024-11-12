@@ -8,7 +8,8 @@ export const updateNotes = createAction(
 )
 
 export const addNote = createAction(
-    '[Notes] Add Note'
+    '[Notes] Add Note',
+    props<{ note: Note }>()
 )
 
 export const updateNote = createAction(

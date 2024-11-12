@@ -18,19 +18,29 @@ export const notesReducer = createReducer(
   // Update Notes
   on(NotesActions.updateNotes, (state, { notes }) => ({
     ...state,
-    notes: notes,
+    notes: notes.map((n) => ({
+      ...n,
+      updatedDate: !n.updatedDate ? new Date() : n.updatedDate,
+    })),
   })),
 
   // Add note
-  on(NotesActions.addNote, (state) => ({
+  on(NotesActions.addNote, (state, { note }) => ({
     ...state,
-    notes: [...state.notes, newNote(state.notes)],
+    notes: [...state.notes, { ...note, updatedDate: new Date() }],
   })),
 
   // Update note
   on(NotesActions.updateNote, (state, { note }) => ({
     ...state,
-    notes: state.notes.map((n) => (n.id === note.id ? note : n)),
+    notes: state.notes.map((n) =>
+      n.id === note.id
+        ? {
+            ...note,
+            updatedDate: n.text !== note.text ? new Date() : n.updatedDate,
+          }
+        : n
+    ),
   })),
 
   // Delete note
@@ -44,19 +54,11 @@ export const notesReducer = createReducer(
     ...state,
     notes: [
       ...state.notes,
-      { ...note, id: getUniqueId(state.notes.map((n) => n.id)) },
+      {
+        ...note,
+        id: getUniqueId(state.notes.map((n) => n.id)),
+        updatedDate: new Date(),
+      },
     ],
   }))
-
-)
-
-
-function newNote(notes: Note[]) {
-  const newNote = {
-    id: getUniqueId(notes.map((n) => n.id)),
-    text: "",
-    opened: false,
-    backgroundClass: `card-bg-${Math.floor(Math.random() * 12) + 1}`, //12 bg in styles.cs
-  };
-  return newNote;
-}
+);

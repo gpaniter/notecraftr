@@ -1,10 +1,12 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   HostListener,
   inject,
   OnDestroy,
   OnInit,
+  signal,
   viewChild,
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
@@ -12,7 +14,7 @@ import { emitTo, listen, UnlistenFn } from "@tauri-apps/api/event";
 import { Editor, EditorModule } from "primeng/editor";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import Quill, { Range } from "quill";
-import { NgClass } from "@angular/common";
+import { DatePipe, NgClass } from "@angular/common";
 import { IconMenuItem, Menu, PredefinedMenuItem } from "@tauri-apps/api/menu";
 import { Store } from "@ngrx/store";
 import * as WindowState from "../../../state/window";
@@ -26,7 +28,7 @@ import {
 @Component({
   selector: "nc-note-preview-window",
   standalone: true,
-  imports: [EditorModule, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [EditorModule, FormsModule, ReactiveFormsModule, NgClass, DatePipe],
   templateUrl: "./note-preview-window.component.html",
   styleUrl: "./note-preview-window.component.scss",
 })
@@ -38,6 +40,18 @@ export class NotePreviewWindowComponent
   windowBlured = this.store.selectSignal(WindowState.blurred);
   theme = this.store.selectSignal(WindowState.theme);
   notes = this.store.selectSignal(NotesState.notes);
+  updatedDate = signal<Date | undefined>(undefined);
+  actionsVisible = signal(false);
+
+  dateFormat = computed(() => {
+    const updatedDate = this.updatedDate() || new Date();
+    const currentDate = new Date();
+    const daysSinceUpdated =
+      (currentDate.getTime() - updatedDate.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceUpdated > 1 ? "MMM d, y" : "h:mm a";
+  });
+
+  dateDisplay = signal("");
 
   note: Note = { text: "", id: 0, opened: true, backgroundClass: "card-bg-1" };
   textFormControl = new FormControl<string>("");
@@ -63,10 +77,13 @@ export class NotePreviewWindowComponent
     this.textFormControl.setValue(this.note.text);
     this.textFormControl.valueChanges.subscribe((text) => {
       emitTo("notecraftr", "note-change", { ...this.note, text });
+      this.updatedDate.set(new Date());
     });
     this.store.dispatch(
       NotesState.updateNote({ note: { ...this.note, opened: true } })
     );
+
+    this.updatedDate.set(this.note.updatedDate);
   }
 
   ngAfterViewInit(): void {

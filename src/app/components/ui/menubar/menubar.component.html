@@ -5,19 +5,14 @@
   (mouseenter)="updateMouseHovered(true)"
   (mouseleave)="updateMouseHovered(false)"
 >
-  @if (notePreviewWindowMode()) {
-  <div class="left-container" id="tauri-drag">
-    <!-- REMOVED FEATURE BECAUSE BUGGY -->
-    @if (!windowBlured()) {
-    <div class="add-note-button" pRipple (click)="addNote()">
-      <span class="fluent--add-16-regular"></span>
-    </div>
-    }
-  </div>
-
-  } @else {
-
-  <div class="left-container" id="tauri-drag">
+  <div
+    class="left-container"
+    id="tauri-drag"
+    [ngClass]="{
+      'left-container-editor': editorMode() && !notePreviewWindowMode()
+    }"
+  >
+    @if (logoButtonVisible()) {
     <p-button
       icon="custom"
       [text]="true"
@@ -29,68 +24,102 @@
     >
       <span class="notecraftr-icon icon-20"></span>
     </p-button>
+    } @if (addNoteButtonVisible()) {
+    <div class="add-note-button" pRipple (click)="addNote()">
+      <span class="fluent--add-16-regular"></span>
+    </div>
+    } @if (templatesButtonVisible()) {
+    <div id="tauri-drag">
+      <p-button
+        label="Templates"
+        [text]="true"
+        severity="contrast"
+        size="small"
+        (onClick)="menu.toggle($event)"
+        [disabled]="templateMenuItems().length <= 0"
+        pTooltip="Templates"
+        tooltipPosition="bottom"
+        showDelay="1000"
+        hideDelay="300"
+      />
+      <p-menu
+        class="menu-button"
+        #menu
+        appendTo="body"
+        [model]="templateMenuItems()"
+        [popup]="true"
+      />
+    </div>
+    } @if (templateOptionsButtonVisible()) {
+    <div id="tauri-drag">
+      <p-button
+        [outlined]="true"
+        [text]="false"
+        [disabled]="!activeTemplate()"
+        severity="primary"
+        (onClick)="actions.toggle($event)"
+        size="small"
+        pTooltip="Template Options"
+        tooltipPosition="bottom"
+        showDelay="1000"
+        hideDelay="300"
+      >
+        <div class="title-container">
+          <span class="template-title">
+            {{ activeTemplateTitle() }}
+          </span>
+          <span class="mingcute--more-2-fill template-edit-icon"></span>
+        </div>
+      </p-button>
+      <p-menu
+        class="menu-button"
+        #actions
+        appendTo="body"
+        [model]="templateActionItems()"
+        [popup]="true"
+      />
+    </div>
 
-    @if (editorMode()) {
-
-    <p-button
-      label="Templates"
-      [text]="true"
-      severity="contrast"
-      size="small"
-      (onClick)="menu.toggle($event)"
-      [disabled]="templateMenuItems().length <= 0"
-      pTooltip="Templates"
-      tooltipPosition="bottom"
-      showDelay="1000"
-      hideDelay="300"
-    />
-    <p-menu
-      class="menu-button"
-      #menu
-      appendTo="body"
-      [model]="templateMenuItems()"
-      [popup]="true"
-    />
-
-    <p-button
-      [outlined]="true"
-      [text]="false"
-      [disabled]="!activeTemplate()"
-      severity="primary"
-      (onClick)="actions.toggle($event)"
-      size="small"
-      pTooltip="Template Options"
-      tooltipPosition="bottom"
-      showDelay="1000"
-      hideDelay="300"
-    >
-      <div class="title-container">
-        <span class="template-title">
-          {{ activeTemplateTitle() }}
-        </span>
-        <span class="mingcute--more-2-fill template-edit-icon"></span>
-      </div>
-    </p-button>
-    <p-menu
-      class="menu-button"
-      #actions
-      appendTo="body"
-      [model]="templateActionItems()"
-      [popup]="true"
-    />
-
-    } @else {
+    } @if (titleVisible()) {
     <span></span>
-    <span id="tauri-drag">
+    <!-- <span id="tauri-drag">
       {{ viewTitle() }}
-    </span>
+    </span> -->
     }
   </div>
-  }
 
   <div class="right-container" id="tauri-drag">
-    @if (!notePreviewWindowMode()) { @if (addonsEnabled()) {
-
+    @if (showNotesListBButtonVisible()) {
+    <p-button
+      class="notes-list-button"
+      icon="fluent--window-bullet-list-20-filled icon-20"
+      [text]="true"
+      [rounded]="true"
+      severity="secondary"
+      pTooltip="Hide/Show Notes List"
+      tooltipPosition="bottom"
+      showDelay="1000"
+      hideDelay="300"
+      (onClick)="showNotesList()"
+    >
+    </p-button>
+    } 
+    @if (deleteNoteButtonVisible()) {
+      <p-button
+      class="delete-button"
+      icon="mingcute--delete-2-fill"
+      [text]="true"
+      [rounded]="true"
+      severity="secondary"
+      pTooltip="Delete Note"
+      tooltipPosition="bottom"
+      showDelay="1000"
+      hideDelay="300"
+      (onClick)="deleteNote()"
+    >
+    </p-button>
+    }
+    @if (addonsButtonsVisible()) {
     <p-menu
       class="addons-menu"
       #addons
@@ -111,8 +140,9 @@
       (onClick)="addons.toggle($event)"
     >
     </p-button>
-    }
-
+    } 
+    
+    @if (settingsButtonVisible()) {
     <p-button
       class="settings-button"
       icon="fluent--settings-16-filled icon-24"
@@ -126,13 +156,11 @@
       hideDelay="300"
     >
     </p-button>
-    } @if ((!windowBlured() && notePreviewWindowMode()) ||
-    !notePreviewWindowMode()) {
-
+    } @if (minimizeButtonVisible()) {
     <div class="minimize-button" pRipple (click)="minimizeApp()">
       <span class="fluent--minimize-16-regular"></span>
     </div>
-
+    } @if (restoreButtonVisible()) {
     <div class="restore-button" pRipple (click)="toggleRestoreApp()">
       <span
         [class]="
@@ -142,7 +170,7 @@
         "
       ></span>
     </div>
-
+    } @if (closeButtonVisible()) {
     <div
       class="close-button"
       pRipple

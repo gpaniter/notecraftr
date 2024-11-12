@@ -11,19 +11,36 @@
   transition: box-shadow 200ms, opacity 200ms, scale 200ms;
   overflow: hidden;
   gap: 1rem;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2rem), calc(100% - 2rem) 100%, 0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), calc(100% - 1.5rem) 100%, 0 100%);
 
 }
 
 .main-container::after {
     content: "";
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     background-color: var(--surface-300);
     position: absolute;
     bottom: 0rem;
     right: 0rem;
     border-radius: var(--border-radius) 0rem 0rem 0rem;
+}
+
+.note-color-bar {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  height: 0.7rem;
+  background-color: var(--complimentary-color-a);
+}
+
+.date-updated {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  font-size: x-small;
+  color: var(--text-color-secondary);
 }
 
 .note-preview {
@@ -42,7 +59,7 @@
   display: grid;
   position: absolute;
   right: 0rem;
-  top: 0rem;
+  top: 0.7rem;
   align-items: center;
   justify-content: start;
   width: 0px;

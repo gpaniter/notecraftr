@@ -6,14 +6,15 @@ import {
   isDevMode,
   OnInit,
 } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { MenubarComponent } from "./components/ui/menubar/menubar.component";
 import { ToastModule } from "primeng/toast";
-import { MessageService, PrimeNGConfig } from "primeng/api";
+import { Message, MessageService, PrimeNGConfig } from "primeng/api";
 import { DialogService } from "primeng/dynamicdialog";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import {
   getAllNoteCraftrWindows,
+  getCurrentNCWindow,
   getWindowFocused,
   getWindowPosition,
   isMaximized,
@@ -30,6 +31,7 @@ import { Location } from "@angular/common";
 import { Note } from "./types/notecraftr";
 import * as NotesState from "./state/notes";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { NotesService } from "./services/notes.service";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -47,6 +49,8 @@ export class AppComponent implements OnInit {
   customDialog = inject(CustomDialogService);
   messageService = inject(MessageService);
   dialogService = inject(DialogService);
+  notesService = inject(NotesService);
+  router = inject(Router);
   message = this.store.select(WindowState.message);
   notes = this.store.selectSignal(NotesState.notes);
 
@@ -59,6 +63,8 @@ export class AppComponent implements OnInit {
   noteWindowMove$: UnlistenFn | undefined;
   noteWindowResize$: UnlistenFn | undefined;
   noteCreateRequest$: UnlistenFn | undefined;
+  noteDeleteRequest$: UnlistenFn | undefined;
+  hideShowMainWindow$: UnlistenFn | undefined;
   locationUnregister$: VoidFunction | undefined;
 
   themeChange$ = effect(() => {
@@ -104,6 +110,8 @@ export class AppComponent implements OnInit {
       this.noteChange$,
       this.noteWindowMove$,
       this.noteWindowResize$,
+      this.noteDeleteRequest$,
+      this.hideShowMainWindow$,
     ];
     unlistens.forEach((unlisten) => {
       if (unlisten) {
@@ -154,6 +162,7 @@ export class AppComponent implements OnInit {
     });
     
     this.noteWindowResize$ = await listen("note-window-size", (e) => {
+      if (getCurrentNCWindow().label === "notecraftr") return
       const payload = e.payload as {
         url: string;
         size: { width: number; height: number };
@@ -169,6 +178,8 @@ export class AppComponent implements OnInit {
       }
     });
     this.noteWindowMove$ = await listen("note-window-position", (e) => {
+      if (getCurrentNCWindow().label === "notecraftr") return
+
       const payload = e.payload as {
         url: string;
         position: { x: number; y: number };
@@ -181,6 +192,38 @@ export class AppComponent implements OnInit {
             note: { ...note, x: payload.position.x, y: payload.position.y },
           })
         );
+      }
+    });
+    this.hideShowMainWindow$ = await listen("hide-show-main-window", (e) => {
+      if (getCurrentNCWindow().label === "notecraftr") {
+        getCurrentNCWindow().isVisible().then(v => {
+          if (v) {
+            getCurrentNCWindow().hide();
+            return;
+          }
+          this.router.navigate(['/notes']);
+          getCurrentNCWindow().show();
+        })
+      }
+    });
+    this.noteDeleteRequest$ = await listen("request-note-delete", (e) => {
+      if (getCurrentNCWindow().label !== "notecraftr") return;
+      const noteId = Number((e.payload as any).label.replace("note-", ""));
+      const note = this.notes().find((n) => n.id === noteId);
+      if (note) {
+        this.store.dispatch(NotesState.deleteNote({ note }));
+        const message: Message = {
+          severity: "error",
+          summary: "Note Deleted",
+          detail: `Note was deleted.`,
+        };
+        this.store.dispatch(WindowState.showMessage({ message: message }));
+        getCurrentNCWindow().isVisible().then(v => {
+          if (v) {
+            getCurrentNCWindow().setFocus();
+          }
+        }
+      )
       }
     });
   }
@@ -205,11 +248,16 @@ export class AppComponent implements OnInit {
       });
     });
 
+    
+
     this.noteCreateRequest$ = await listen("request-note-create", () => {
-      this.store.dispatch(NotesState.addNote());
-      const notes = this.notes();
-      const latestNote = notes.length > 0 ? notes[notes.length - 1] : undefined;
-      if (latestNote) this.openNote(latestNote);
+      const newNote= this.notesService.getNewNote(this.notes().map(n => n.id));
+      this.store.dispatch(NotesState.addNote({ note: newNote }));
+      this.notesService.openNote(newNote, () => {
+        this.store.dispatch(
+          NotesState.updateNote({ note: { ...newNote, opened: true } })
+        );
+      })
     });
   }
 

@@ -29,6 +29,7 @@ import { getUniqueId } from "../../../utils/helpers";
 import * as WindowState from "../../../state/window/";
 import { CustomDialogService } from "../../../services/custom-dialog.service";
 import * as EditorState from "../../../state/editor/";
+import { deleteNote } from "../../../state/notes";
 
 @Component({
   selector: "nc-menubar",
@@ -58,6 +59,43 @@ export class MenubarComponent {
     return ["", "/", "/editor"].includes(url);
   });
   windowBlured = this.store.selectSignal(WindowState.blurred);
+  logoButtonVisible = computed(() => {
+    return !this.notePreviewWindowMode();
+  })
+  addNoteButtonVisible = computed(() => {
+    return this.notePreviewWindowMode() && !this.windowBlured();
+  })
+  showNotesListBButtonVisible = computed(() => {
+    return this.notePreviewWindowMode() && !this.windowBlured();
+  })
+  deleteNoteButtonVisible = computed(() => {
+    return this.notePreviewWindowMode() && !this.windowBlured();
+  })
+  templatesButtonVisible = computed(() => {
+    return this.editorMode();
+  })
+  templateOptionsButtonVisible = computed(() => {
+    return this.editorMode();
+  })
+  titleVisible = computed(() => {
+    return !this.notePreviewWindowMode() && !this.editorMode();
+  })
+  addonsButtonsVisible = computed(() => {
+    return this.addonsEnabled() && !this.notePreviewWindowMode();
+  })
+  settingsButtonVisible = computed(() => {
+    return !this.notePreviewWindowMode();
+  })
+  minimizeButtonVisible = computed(() => {
+    return !this.notePreviewWindowMode();
+  })
+  restoreButtonVisible = computed(() => {
+    return !this.notePreviewWindowMode();
+  })
+  closeButtonVisible = computed(() => {
+    return !this.notePreviewWindowMode() || (this.notePreviewWindowMode() && !this.windowBlured());
+  })
+  
 
   templateMenuItems = computed<MenuItem[]>(() => {
     const templates = this.templates();
@@ -175,6 +213,16 @@ export class MenubarComponent {
     emitToWindows("notecraftr", "request-note-create", null);
   }
 
+  showNotesList() {
+    emitToWindows("notecraftr", "hide-show-main-window");
+  }
+
+  deleteNote(){
+    emitToWindows("notecraftr", "request-note-delete", {label: getCurrentNCWindow().label}).finally(()=>{
+      this.closeApp();
+    });
+  }
+
   setAsActiveTemplate(id: number) {
     let templates = this.templates();
     let template = templates.find((t) => t.id === id);
@@ -205,16 +253,14 @@ export class MenubarComponent {
   }
 
   async closeApp() {
+    const windows = await  getAllNoteCraftrWindows()
+
     if (getCurrentNCWindow().label === "notecraftr") {
-      getAllNoteCraftrWindows()
-      .then((windows) => {
-        windows.forEach(async (w) => {
-          if (w.label !== "notecraftr") {
-            await w.close();
-          }
-        });
-      })
-      .finally(() => closeWindow());
+      if (windows.length > 1) {
+        getCurrentNCWindow().hide();
+      } else {
+        closeWindow();
+      }
     } else {
       closeWindow();
     }

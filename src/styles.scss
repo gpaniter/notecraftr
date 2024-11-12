@@ -23,7 +23,9 @@ body {
   user-select: none; /* Standard syntax */
 }
 
-
+.card-bg-default {
+  background: var(--surface-card);;
+}
 
 .card-bg-1 {
   --s: 150px; /* control the size*/

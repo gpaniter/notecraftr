@@ -17,17 +17,18 @@ import * as NotesState from "../../../state/notes";
 import { Message } from "primeng/api";
 import { Note } from "../../../types/notecraftr";
 import { getAllNoteCraftrWindows } from "../../../lib/notecraftr-tauri";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { CustomDialogService } from "../../../services/custom-dialog.service";
 import { DialogService } from "primeng/dynamicdialog";
+import { getUniqueId } from "../../../utils/helpers";
+import { NotesService } from "../../../services/notes.service";
 
 @Component({
   selector: "nc-notes",
   standalone: true,
   imports: [
-    CdkDropList,
-    CdkDrag,
-    CdkDragPlaceholder,
+    // CdkDropList,
+    // CdkDrag,
+    // CdkDragPlaceholder,
     ReactiveFormsModule,
     ButtonModule,
     TooltipModule,
@@ -41,6 +42,7 @@ export class NotesComponent implements OnInit {
   store = inject(Store);
   customDialog = inject(CustomDialogService);
   dialogService = inject(DialogService);
+  notesService = inject(NotesService)
   locationService = inject(Location);
   theme = this.store.selectSignal(WindowState.theme);
   notes = this.store.selectSignal(NotesState.notes);
@@ -65,13 +67,19 @@ export class NotesComponent implements OnInit {
   }
 
   addNewNote() {
-    this.store.dispatch(NotesState.addNote());
+    const newNote= this.notesService.getNewNote(this.notes().map(n => n.id));
+    this.store.dispatch(NotesState.addNote({note: newNote}));
     const message: Message = {
       severity: "success",
       summary: "New Note",
       detail: `A new Note was created.`,
     };
     this.store.dispatch(WindowState.showMessage({ message: message }));
+    this.notesService.openNote(newNote, () => {
+      this.store.dispatch(
+        NotesState.updateNote({ note: { ...newNote, opened: true } })
+      );
+    })
   }
 
   noteDrop(event: CdkDragDrop<Note[]>) {
@@ -149,7 +157,11 @@ export class NotesComponent implements OnInit {
           if (latestNote) {
             const x = note.x ? note.x + 10 : undefined;
             const y = note.y ? note.y + 10 : undefined;
-            this.openNote(latestNote, x, y);
+            this.notesService.openNote({...latestNote, x, y}, () => {
+              this.store.dispatch(
+                NotesState.updateNote({ note: { ...latestNote, x, y, opened: true } })
+              );
+            })
           }
         }
         const message: Message = {
@@ -163,33 +175,39 @@ export class NotesComponent implements OnInit {
 
   showHideNoteWindow(event: { note: Note; hide: boolean }) {
     if (event.hide) this.closeNote(event.note);
-    else this.openNote(event.note);
+    else {
+        this.notesService.openNote(event.note, () => {
+        this.store.dispatch(
+          NotesState.updateNote({ note: { ...event.note, opened: true } })
+        );
+      });
+    }
   }
 
-  async openNote(note: Note, x?: number, y?: number) {
-    const hasScreenPos = !!(note.x || note.y);
-    const webview = new WebviewWindow(`note-${note.id}`, {
-      url: isDevMode()
-        ? `http://localhost:4200/note-window/${note.id}`
-        : `tauri://localhost/note-window/${note.id}`,
-      decorations: false,
-      width: note.width || 200,
-      height: note.height || 200,
-      minHeight: 75,
-      minWidth: 200,
-      theme: "light",
-      title: "Notes",
-      center: !hasScreenPos,
-      x: x || note.x,
-      y: y || note.y,
-    });
-    const un = await webview.once("tauri://created", (e) => {
-      this.store.dispatch(
-        NotesState.updateNote({ note: { ...note, opened: true } })
-      );
-      un();
-    });
-  }
+  // async openNote(note: Note, x?: number, y?: number) {
+  //   const hasScreenPos = !!(note.x || note.y);
+  //   const webview = new WebviewWindow(`note-${note.id}`, {
+  //     url: isDevMode()
+  //       ? `http://localhost:4200/note-window/${note.id}`
+  //       : `tauri://localhost/note-window/${note.id}`,
+  //     decorations: false,
+  //     width: note.width || 300,
+  //     height: note.height || 300,
+  //     minHeight: 75,
+  //     minWidth: 200,
+  //     theme: "light",
+  //     title: "Notes",
+  //     center: !hasScreenPos,
+  //     x: x || note.x,
+  //     y: y || note.y,
+  //   });
+  //   const un = await webview.once("tauri://created", (e) => {
+  //     this.store.dispatch(
+  //       NotesState.updateNote({ note: { ...note, opened: true } })
+  //     );
+  //     un();
+  //   });
+  // }
 
   closeNote(note: Note) {
     getAllNoteCraftrWindows().then((windows) => {
@@ -223,7 +241,12 @@ export class NotesComponent implements OnInit {
       })
       .finally(() => {
         if (!foundWindow) {
-          this.openNote(note);
+          // this.openNote(note);
+          this.notesService.openNote(note, () => {
+            this.store.dispatch(
+              NotesState.updateNote({ note: { ...note, opened: true } })
+            );
+          })
         }
       });
   }
