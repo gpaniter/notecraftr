@@ -9,41 +9,46 @@
           pInputText
           autocomplete="off"
           [formControl]="titleFormControl"
+          style="width: 20rem;"
         />
         <label for="title">Title</label>
       </p-floatLabel>
     </div>
     <div class="prefix-container">
       <p-floatLabel>
-        <input
-          type="text"
-          id="prefix"
-          ncInputContextmenu
-          pInputText
-          autocomplete="off"
-          pTooltip="Text that will be added before the selected value. (Optional)"
-          tooltipPosition="bottom"
-          showDelay="1000"
-          hideDelay="300"
-          [formControl]="prefixFormControl"
-        />
+        <textarea
+            type="text"
+            id="prefix"
+            pInputTextarea
+            [rows]="1"
+            [cols]="30"
+            ncInputContextmenu
+            pTooltip="Text that will be added before the selected value. (Optional)"
+            tooltipPosition="bottom"
+            showDelay="1000"
+            hideDelay="300"
+            autocomplete="off"
+            [formControl]="prefixFormControl"
+          ></textarea>
         <label for="prefix">Prefix (Optional)</label>
       </p-floatLabel>
     </div>
     <div class="suffix-container">
       <p-floatLabel>
-        <input
-          type="text"
-          id="suffix"
-          ncInputContextmenu
-          pInputText
-          autocomplete="off"
-          pTooltip="Text that will be added after the selected value. (Optional)"
-          tooltipPosition="bottom"
-          showDelay="1000"
-          hideDelay="300"
-          [formControl]="suffixFormControl"
-        />
+        <textarea
+            type="text"
+            id="suffix"
+            pInputTextarea
+            [rows]="1"
+            [cols]="30"
+            ncInputContextmenu
+            pTooltip="Text that will be added after the selected value. (Optional)"
+            tooltipPosition="bottom"
+            showDelay="1000"
+            hideDelay="300"
+            autocomplete="off"
+            [formControl]="suffixFormControl"
+          ></textarea>
         <label for="suffix">Suffix (Optional)</label>
       </p-floatLabel>
     </div>
@@ -71,6 +76,7 @@
       <p-selectButton
         [options]="typeOptions"
         [formControl]="typeFormControl"
+        [allowEmpty]="false"
         optionLabel="label"
         optionValue="value"
         optionDisabled="disabled"
@@ -87,7 +93,7 @@
       <div class="add-option-button">
         <p-button
           class="add-option-button"
-          severity="secondary"
+          severity="info"
           pTooltip="Add Text Option"
           tooltipPosition="top"
           showDelay="1000"
@@ -118,12 +124,14 @@
             type="text"
             pInputTextarea
             [rows]="1"
+            [cols]="22"
             ncInputContextmenu
             autocomplete="off"
             [placeholder]="'Option ' + (idx + 1)"
             [value]="option"
             (input)="onOptionInput($event, idx)"
           ></textarea>
+
           <div class="option-item-actions">
             @if (hoveredOptionIndex() == idx) {
 
