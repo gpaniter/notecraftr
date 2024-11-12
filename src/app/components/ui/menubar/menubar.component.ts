@@ -44,12 +44,18 @@ export class MenubarComponent {
   dialogService = inject(DialogService);
   customDialog = inject(CustomDialogService);
   output = this.store.selectSignal(EditorState.output);
-  autoCopyOnTemplateChange = this.store.selectSignal(WindowState.autoCopyOnTemplateChange);
-  autoCopyOnOutputChange = this.store.selectSignal(WindowState.autoCopyOnOutputChange);
+  autoCopyOnTemplateChange = this.store.selectSignal(
+    WindowState.autoCopyOnTemplateChange
+  );
+  autoCopyOnOutputChange = this.store.selectSignal(
+    WindowState.autoCopyOnOutputChange
+  );
   addonsEnabled = this.store.selectSignal(WindowState.addonsEnabled);
   activeUrl = this.store.selectSignal(WindowState.activeUrl);
   maximized = this.store.selectSignal(WindowState.maximized);
-  notePreviewWindowMode = this.store.selectSignal(WindowState.notePreviewWindowMode);
+  notePreviewWindowMode = this.store.selectSignal(
+    WindowState.notePreviewWindowMode
+  );
   templates = this.store.selectSignal(EditorState.templates);
   activeTemplate = this.store.selectSignal(EditorState.activeTemplate);
   mouseHovered = signal(false);
@@ -61,41 +67,43 @@ export class MenubarComponent {
   windowBlured = this.store.selectSignal(WindowState.blurred);
   logoButtonVisible = computed(() => {
     return !this.notePreviewWindowMode();
-  })
+  });
   addNoteButtonVisible = computed(() => {
     return this.notePreviewWindowMode() && !this.windowBlured();
-  })
+  });
   showNotesListBButtonVisible = computed(() => {
     return this.notePreviewWindowMode() && !this.windowBlured();
-  })
+  });
   deleteNoteButtonVisible = computed(() => {
     return this.notePreviewWindowMode() && !this.windowBlured();
-  })
+  });
   templatesButtonVisible = computed(() => {
     return this.editorMode();
-  })
+  });
   templateOptionsButtonVisible = computed(() => {
     return this.editorMode();
-  })
+  });
   titleVisible = computed(() => {
     return !this.notePreviewWindowMode() && !this.editorMode();
-  })
+  });
   addonsButtonsVisible = computed(() => {
     return this.addonsEnabled() && !this.notePreviewWindowMode();
-  })
+  });
   settingsButtonVisible = computed(() => {
     return !this.notePreviewWindowMode();
-  })
+  });
   minimizeButtonVisible = computed(() => {
     return !this.notePreviewWindowMode();
-  })
+  });
   restoreButtonVisible = computed(() => {
     return !this.notePreviewWindowMode();
-  })
+  });
   closeButtonVisible = computed(() => {
-    return !this.notePreviewWindowMode() || (this.notePreviewWindowMode() && !this.windowBlured());
-  })
-  
+    return (
+      !this.notePreviewWindowMode() ||
+      (this.notePreviewWindowMode() && !this.windowBlured())
+    );
+  });
 
   templateMenuItems = computed<MenuItem[]>(() => {
     const templates = this.templates();
@@ -193,7 +201,6 @@ export class MenubarComponent {
     }
   });
 
-
   ngOnDestroy(): void {}
 
   @HostListener("mousedown", ["$event"])
@@ -217,10 +224,10 @@ export class MenubarComponent {
     emitToWindows("notecraftr", "hide-show-main-window");
   }
 
-  deleteNote(){
-    emitToWindows("notecraftr", "request-note-delete", {label: getCurrentNCWindow().label}).finally(()=>{
-      this.closeApp();
-    });
+  deleteNote() {
+    emitToWindows("notecraftr", "request-note-delete", {
+      label: getCurrentNCWindow().label,
+    }).finally(this.closeApp);
   }
 
   setAsActiveTemplate(id: number) {
@@ -253,16 +260,30 @@ export class MenubarComponent {
   }
 
   async closeApp() {
-    const windows = await  getAllNoteCraftrWindows()
-
+    const windows = await getAllNoteCraftrWindows();
+    const main = windows.find((w) => w.label === "notecraftr");
+    const notes = windows.filter((w) => w.label !== "notecraftr");
+    // If main window, hide if there's note window opened
     if (getCurrentNCWindow().label === "notecraftr") {
-      if (windows.length > 1) {
+      if (notes.length > 0) {
         getCurrentNCWindow().hide();
+      } else {
+        getCurrentNCWindow().close();
+      }
+    }
+    // If Note window, close main if it's hidden and no Notes opened
+    else {
+      if (notes.length === 1) {
+        if (main) {
+          main.isVisible().then((v) => {
+            if (!v) {
+              main.close();
+            }
+          }).finally(closeWindow);
+        }
       } else {
         closeWindow();
       }
-    } else {
-      closeWindow();
     }
   }
 
@@ -296,7 +317,6 @@ export class MenubarComponent {
         no: "Cancel",
       },
       (v) => {
-        
         const message: Message = {
           severity: "error",
           summary: "Template Deleted",
@@ -318,8 +338,8 @@ export class MenubarComponent {
           severity: "secondary",
           summary: "Cancelled",
           detail: "Template deletion was cancelled",
-        }
-        this.store.dispatch(WindowState.showMessage({message}));
+        };
+        this.store.dispatch(WindowState.showMessage({ message }));
       }
     );
   }
@@ -342,7 +362,10 @@ export class MenubarComponent {
     let template = templates.find((t) => t.active);
     if (!template) return;
 
-      this.customDialog.openTemplateEditDialog(this.dialogService, template, (newTemp) => {
+    this.customDialog.openTemplateEditDialog(
+      this.dialogService,
+      template,
+      (newTemp) => {
         this.store.dispatch(EditorState.updateTemplate({ template: newTemp }));
         const message: Message = {
           severity: "info",
@@ -356,8 +379,8 @@ export class MenubarComponent {
           severity: "secondary",
           summary: "Cancelled",
           detail: "Template edit was cancelled",
-        }
-        this.store.dispatch(WindowState.showMessage({message}));
+        };
+        this.store.dispatch(WindowState.showMessage({ message }));
       }
     );
   }
