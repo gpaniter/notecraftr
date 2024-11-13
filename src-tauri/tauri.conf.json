@@ -29,7 +29,7 @@
       "assetProtocol": {
         "enable": true,
         
-        "scope": ["**/*"]
+        "scope": ["**/*"] 
       },
       "csp": null
     }
